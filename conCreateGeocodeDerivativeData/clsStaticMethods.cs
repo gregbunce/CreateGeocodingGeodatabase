@@ -71,8 +71,9 @@ namespace conCreateGeocodeDerivativeData
             }
             else
             {
-                
-                workspaceName = (IWorkspaceName)workspaceFactory.OpenFromFile(strFgdPath + strFgdName, 0);
+                IFileNames arcFileNames = new FileNames();
+                arcFileNames.Add(strFgdPath + strFgdName);
+                workspaceName = workspaceFactory.GetWorkspaceName(strFgdPath, arcFileNames);
             }
 
             // Cast the workspace name object to the IName interface and open the workspace.
