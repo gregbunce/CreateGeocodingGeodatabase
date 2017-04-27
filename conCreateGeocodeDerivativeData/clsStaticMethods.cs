@@ -59,10 +59,21 @@ namespace conCreateGeocodeDerivativeData
         // create a file geodatabase in user-specified location
         public static IWorkspace CreateFileGdbWorkspace(string strFgdPath, string strFgdName)
         {
+            IWorkspaceName workspaceName = null;
             // Instantiate a file geodatabase workspace factory and create a new file geodatabase.
             // The Create method returns a workspace name object.
             IWorkspaceFactory workspaceFactory = new FileGDBWorkspaceFactoryClass() as IWorkspaceFactory;
-            IWorkspaceName workspaceName = workspaceFactory.Create(strFgdPath, strFgdName, null, 0);
+
+            // check if file geodatabase exists, before creating it
+            if (!(workspaceFactory.IsWorkspace(strFgdPath + strFgdName)))
+            {
+                workspaceName = workspaceFactory.Create(strFgdPath, strFgdName, null, 0);
+            }
+            else
+            {
+                
+                workspaceName = (IWorkspaceName)workspaceFactory.OpenFromFile(strFgdPath + strFgdName, 0);
+            }
 
             // Cast the workspace name object to the IName interface and open the workspace.
             IName name = (IName)workspaceName;
@@ -190,8 +201,12 @@ namespace conCreateGeocodeDerivativeData
 
 
         #region "create feature class in file geodatabase"
-        public static IFeatureClass CreateFeatureClass(String featureClassName, UID classExtensionUID, IFeatureWorkspace featureWorkspace)
+        public static ESRI.ArcGIS.Geodatabase.IFeatureClass CreateFeatureClass(String featureClassName, UID classExtensionUID, IFeatureWorkspace featureWorkspace)
         {
+            // check if the fc exist, if so rename it
+
+
+
             // Create a fields collection for the feature class.
             IFields fields = new FieldsClass();
             IFieldsEdit fieldsEdit = (IFieldsEdit)fields;
@@ -206,10 +221,9 @@ namespace conCreateGeocodeDerivativeData
             // Create a geometry definition (and spatial reference) for the feature class.
             IGeometryDef geometryDef = new GeometryDefClass();
             IGeometryDefEdit geometryDefEdit = (IGeometryDefEdit)geometryDef;
-            geometryDefEdit.GeometryType_2 = esriGeometryType.esriGeometryLine;
+            geometryDefEdit.GeometryType_2 = esriGeometryType.esriGeometryPolyline;
             ISpatialReferenceFactory spatialReferenceFactory = new SpatialReferenceEnvironmentClass();
-            ISpatialReference spatialReference =
-            spatialReferenceFactory.CreateProjectedCoordinateSystem((int)esriSRProjCSType.esriSRProjCS_NAD1983UTM_12N);
+            ISpatialReference spatialReference = spatialReferenceFactory.CreateProjectedCoordinateSystem((int)esriSRProjCSType.esriSRProjCS_NAD1983UTM_12N);
             ISpatialReferenceResolution spatialReferenceResolution = (ISpatialReferenceResolution)spatialReference;
             spatialReferenceResolution.ConstructFromHorizon();
             ISpatialReferenceTolerance spatialReferenceTolerance = (ISpatialReferenceTolerance)spatialReference;
@@ -224,13 +238,105 @@ namespace conCreateGeocodeDerivativeData
             geometryFieldEdit.GeometryDef_2 = geometryDef;
             fieldsEdit.AddField(geometryField);
 
-            // Create a text field called "Name" for the fields collection.
+            // Create a text field called "ADDR_SYS" for the fields collection.
+            IField addrSysField = new FieldClass();
+            IFieldEdit addrSysFieldEdit = (IFieldEdit)addrSysField;
+            addrSysFieldEdit.Name_2 = "ADDR_SYS";
+            addrSysFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            addrSysFieldEdit.Length_2 = 50;
+            fieldsEdit.AddField(addrSysField);
+
+            // Create a text field called "L_F_ADD" for the fields collection.
+            IField rangeL_Ffield = new FieldClass();
+            IFieldEdit rangeL_FfieldEdit = (IFieldEdit)rangeL_Ffield;
+            rangeL_FfieldEdit.Name_2 = "L_F_ADD";
+            rangeL_FfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
+            rangeL_FfieldEdit.Precision_2 = 38;
+            rangeL_FfieldEdit.Scale_2 = 8;
+            fieldsEdit.AddField(rangeL_Ffield);
+
+            // Create a text field called "L_F_ADD" for the fields collection.
+            IField rangeL_Tfield = new FieldClass();
+            IFieldEdit rangeL_TfieldEdit = (IFieldEdit)rangeL_Tfield;
+            rangeL_TfieldEdit.Name_2 = "L_F_ADD";
+            rangeL_TfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
+            rangeL_TfieldEdit.Precision_2 = 38;
+            rangeL_TfieldEdit.Scale_2 = 8;
+            fieldsEdit.AddField(rangeL_Tfield);
+
+            // Create a text field called "R_F_ADD" for the fields collection.
+            IField rangeR_Ffield = new FieldClass();
+            IFieldEdit rangeR_FfieldEdit = (IFieldEdit)rangeR_Ffield;
+            rangeR_FfieldEdit.Name_2 = "R_F_ADD";
+            rangeR_FfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
+            rangeR_FfieldEdit.Precision_2 = 38;
+            rangeR_FfieldEdit.Scale_2 = 8;
+            fieldsEdit.AddField(rangeR_Ffield);
+
+            // Create a text field called "R_T_ADD" for the fields collection.
+            IField rangeR_Tfield = new FieldClass();
+            IFieldEdit rangeR_TfieldEdit = (IFieldEdit)rangeR_Tfield;
+            rangeR_TfieldEdit.Name_2 = "R_T_ADD";
+            rangeR_TfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
+            rangeR_TfieldEdit.Precision_2 = 38;
+            rangeR_TfieldEdit.Scale_2 = 8;
+            fieldsEdit.AddField(rangeR_Tfield);
+
+            // Create a text field called "PREDIR" for the fields collection.
+            IField predirField = new FieldClass();
+            IFieldEdit predirFieldEdit = (IFieldEdit)predirField;
+            predirFieldEdit.Name_2 = "PREDIR";
+            predirFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            predirFieldEdit.Length_2 = 1;
+            fieldsEdit.AddField(predirField);
+
+            // Create a text field called "STREETNAME" for the fields collection.
             IField nameField = new FieldClass();
             IFieldEdit nameFieldEdit = (IFieldEdit)nameField;
-            nameFieldEdit.Name_2 = "Name";
+            nameFieldEdit.Name_2 = "STREETNAME";
             nameFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
-            nameFieldEdit.Length_2 = 20;
+            nameFieldEdit.Length_2 = 30;
             fieldsEdit.AddField(nameField);
+
+            // Create a text field called "STREETTYPE" for the fields collection.
+            IField streettypeField = new FieldClass();
+            IFieldEdit streettypeFieldEdit = (IFieldEdit)streettypeField;
+            streettypeFieldEdit.Name_2 = "STREETTYPE";
+            streettypeFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            streettypeFieldEdit.Length_2 = 4;
+            fieldsEdit.AddField(streettypeField);
+
+            // Create a text field called "SUFDIR" for the fields collection.
+            IField sufdirField = new FieldClass();
+            IFieldEdit sufdirFieldEdit = (IFieldEdit)sufdirField;
+            sufdirFieldEdit.Name_2 = "SUFDIR";
+            sufdirFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            sufdirFieldEdit.Length_2 = 1;
+            fieldsEdit.AddField(sufdirField);
+
+            // Create a text field called "ZIPLEFT" for the fields collection.
+            IField zipleftField = new FieldClass();
+            IFieldEdit zipleftFieldEdit = (IFieldEdit)zipleftField;
+            zipleftFieldEdit.Name_2 = "ZIPLEFT";
+            zipleftFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            zipleftFieldEdit.Length_2 = 5;
+            fieldsEdit.AddField(zipleftField);
+
+            // Create a text field called "ZIPRIGHT" for the fields collection.
+            IField ziprightField = new FieldClass();
+            IFieldEdit ziprightFieldEdit = (IFieldEdit)ziprightField;
+            ziprightFieldEdit.Name_2 = "ZIPRIGHT";
+            ziprightFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            ziprightFieldEdit.Length_2 = 5;
+            fieldsEdit.AddField(ziprightField);
+
+            // Create a text field called "GLOBALID_SGID" for the fields collection - to join to the table or sgid.
+            IField globalidField = new FieldClass();
+            IFieldEdit globalidFieldEdit = (IFieldEdit)globalidField;
+            globalidFieldEdit.Name_2 = "GLOBALID_SGID";
+            globalidFieldEdit.Type_2 = esriFieldType.esriFieldTypeString; // use string and not the globalid type b/c it might that might assign it's own unique global id and this is for joinging back to sgid
+            globalidFieldEdit.Length_2 = 50;
+            fieldsEdit.AddField(globalidField);
 
             // Use IFieldChecker to create a validated fields collection.
             IFieldChecker fieldChecker = new FieldCheckerClass();
@@ -249,6 +355,148 @@ namespace conCreateGeocodeDerivativeData
             return featureClass;
         }
         #endregion
+
+
+
+        #region "create table in file geodatabase"
+        public static ESRI.ArcGIS.Geodatabase.ITable CreateTable(String tableName, UID classExtensionUID, IFeatureWorkspace featureWorkspace)
+        {
+            // Create a fields collection for the feature class.
+            IFields fields = new FieldsClass();
+            IFieldsEdit fieldsEdit = (IFieldsEdit)fields;
+
+            // Add an object ID field to the fields collection. This is mandatory for feature classes.
+            IField oidField = new FieldClass();
+            IFieldEdit oidFieldEdit = (IFieldEdit)oidField;
+            oidFieldEdit.Name_2 = "OBJECTID";
+            oidFieldEdit.Type_2 = esriFieldType.esriFieldTypeOID;
+            fieldsEdit.AddField(oidField);
+
+            // Create a text field called "ADDR_SYS" for the fields collection.
+            IField addrSysField = new FieldClass();
+            IFieldEdit addrSysFieldEdit = (IFieldEdit)addrSysField;
+            addrSysFieldEdit.Name_2 = "ADDR_SYS";
+            addrSysFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            addrSysFieldEdit.Length_2 = 50;
+            fieldsEdit.AddField(addrSysField);
+
+            // Create a text field called "L_F_ADD" for the fields collection.
+            IField rangeL_Ffield = new FieldClass();
+            IFieldEdit rangeL_FfieldEdit = (IFieldEdit)rangeL_Ffield;
+            rangeL_FfieldEdit.Name_2 = "L_F_ADD";
+            rangeL_FfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
+            rangeL_FfieldEdit.Precision_2 = 38;
+            rangeL_FfieldEdit.Scale_2 = 8;
+            fieldsEdit.AddField(rangeL_Ffield);
+
+            // Create a text field called "L_F_ADD" for the fields collection.
+            IField rangeL_Tfield = new FieldClass();
+            IFieldEdit rangeL_TfieldEdit = (IFieldEdit)rangeL_Tfield;
+            rangeL_TfieldEdit.Name_2 = "L_F_ADD";
+            rangeL_TfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
+            rangeL_TfieldEdit.Precision_2 = 38;
+            rangeL_TfieldEdit.Scale_2 = 8;
+            fieldsEdit.AddField(rangeL_Tfield);
+
+            // Create a text field called "R_F_ADD" for the fields collection.
+            IField rangeR_Ffield = new FieldClass();
+            IFieldEdit rangeR_FfieldEdit = (IFieldEdit)rangeR_Ffield;
+            rangeR_FfieldEdit.Name_2 = "R_F_ADD";
+            rangeR_FfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
+            rangeR_FfieldEdit.Precision_2 = 38;
+            rangeR_FfieldEdit.Scale_2 = 8;
+            fieldsEdit.AddField(rangeR_Ffield);
+
+            // Create a text field called "R_T_ADD" for the fields collection.
+            IField rangeR_Tfield = new FieldClass();
+            IFieldEdit rangeR_TfieldEdit = (IFieldEdit)rangeR_Tfield;
+            rangeR_TfieldEdit.Name_2 = "R_T_ADD";
+            rangeR_TfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
+            rangeR_TfieldEdit.Precision_2 = 38;
+            rangeR_TfieldEdit.Scale_2 = 8;
+            fieldsEdit.AddField(rangeR_Tfield);
+
+            // Create a text field called "PREDIR" for the fields collection.
+            IField predirField = new FieldClass();
+            IFieldEdit predirFieldEdit = (IFieldEdit)predirField;
+            predirFieldEdit.Name_2 = "PREDIR";
+            predirFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            predirFieldEdit.Length_2 = 1;
+            fieldsEdit.AddField(predirField);
+
+            // Create a text field called "STREETNAME" for the fields collection.
+            IField nameField = new FieldClass();
+            IFieldEdit nameFieldEdit = (IFieldEdit)nameField;
+            nameFieldEdit.Name_2 = "STREETNAME";
+            nameFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            nameFieldEdit.Length_2 = 30;
+            fieldsEdit.AddField(nameField);
+
+            // Create a text field called "STREETTYPE" for the fields collection.
+            IField streettypeField = new FieldClass();
+            IFieldEdit streettypeFieldEdit = (IFieldEdit)streettypeField;
+            streettypeFieldEdit.Name_2 = "STREETTYPE";
+            streettypeFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            streettypeFieldEdit.Length_2 = 4;
+            fieldsEdit.AddField(streettypeField);
+
+            // Create a text field called "SUFDIR" for the fields collection.
+            IField sufdirField = new FieldClass();
+            IFieldEdit sufdirFieldEdit = (IFieldEdit)sufdirField;
+            sufdirFieldEdit.Name_2 = "SUFDIR";
+            sufdirFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            sufdirFieldEdit.Length_2 = 1;
+            fieldsEdit.AddField(sufdirField);
+
+            // Create a text field called "ZIPLEFT" for the fields collection.
+            IField zipleftField = new FieldClass();
+            IFieldEdit zipleftFieldEdit = (IFieldEdit)zipleftField;
+            zipleftFieldEdit.Name_2 = "ZIPLEFT";
+            zipleftFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            zipleftFieldEdit.Length_2 = 5;
+            fieldsEdit.AddField(zipleftField);
+
+            // Create a text field called "ZIPRIGHT" for the fields collection.
+            IField ziprightField = new FieldClass();
+            IFieldEdit ziprightFieldEdit = (IFieldEdit)ziprightField;
+            ziprightFieldEdit.Name_2 = "ZIPRIGHT";
+            ziprightFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+            ziprightFieldEdit.Length_2 = 5;
+            fieldsEdit.AddField(ziprightField);
+
+            // Create a text field called "GLOBALID_SGID" for the fields collection - to join back to the feature class or sgid.
+            IField globalidField = new FieldClass();
+            IFieldEdit globalidFieldEdit = (IFieldEdit)globalidField;
+            globalidFieldEdit.Name_2 = "GLOBALID_SGID";
+            globalidFieldEdit.Type_2 = esriFieldType.esriFieldTypeString; // use string and not the globalid type b/c it might that might assign it's own unique global id and this is for joinging back to sgid
+            globalidFieldEdit.Length_2 = 50;
+            fieldsEdit.AddField(globalidField);
+
+            // Use IFieldChecker to create a validated fields collection.
+            IFieldChecker fieldChecker = new FieldCheckerClass();
+            IEnumFieldError enumFieldError = null;
+            IFields validatedFields = null;
+            fieldChecker.ValidateWorkspace = (IWorkspace)featureWorkspace;
+            fieldChecker.Validate(fields, out enumFieldError, out validatedFields);
+
+            // Create the feature class. Note that the CLSID parameter is null - this indicates to use the
+            // default CLSID, esriGeodatabase.Feature (acceptable in most cases for feature classes).
+            ESRI.ArcGIS.Geodatabase.ITable arcTable = featureWorkspace.CreateTable(tableName, validatedFields, null, classExtensionUID, "");
+
+            return arcTable;
+        }
+        #endregion
+
+
+
+        // this method checks if the feature class or table exist in the geodatabase
+        public static bool NameExists(IWorkspace2 arcWorkspace2, string strFCName)
+        {
+            bool blnNameExists;
+            return blnNameExists = arcWorkspace2.get_NameExists(esriDatasetType.esriDTAny, strFCName);
+        }
+
+
 
 
     }

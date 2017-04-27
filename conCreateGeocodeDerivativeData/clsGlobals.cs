@@ -52,5 +52,10 @@ namespace conCreateGeocodeDerivativeData
             set;
         }
 
+        public static ITable arcTable_AltNames
+        {
+            get;
+            set;
+        }
     }
 }

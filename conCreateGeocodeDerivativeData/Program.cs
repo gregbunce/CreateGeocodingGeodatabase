@@ -38,25 +38,35 @@ namespace conCreateGeocodeDerivativeData
                 // get the source roads feature class
                 clsGlobals.arcFeatClass_Roads = clsGlobals.arcFeatureWorkspaceSGID.OpenFeatureClass(args[0]);
 
-                if (clsGlobals.arcFeat_Roads != null)
-                {
-                    Console.WriteLine("Got access to the SGID feature class named: " + args[0]);                    
-                }
-                else
-                {
-                    Console.WriteLine("Cannot get access to the SGID feature class named: " + args[0]);
-                    return;
-                }
+                //if (clsGlobals.arcFeat_Roads != null)
+                //{
+                //    Console.WriteLine("Got access to the SGID feature class named: " + args[0]);                    
+                //}
+                //else
+                //{
+                //    Console.WriteLine("Cannot get access to the SGID feature class named: " + args[0]);
+                //    return;
+                //}
 
                 // create the file geodatabase for the derived geocoding data
                 clsGlobals.arcWorkspaceGeocodeFGD = clsStaticMethods.CreateFileGdbWorkspace(args[1], args[2]);
                 clsGlobals.arcFeatureWorkspaceGeocodeFGD = (IFeatureWorkspace)clsGlobals.arcWorkspaceGeocodeFGD;
 
+                // check if the feature class or table names exist in the file geodatabase
+                IWorkspace2 arcWork2 = (IWorkspace2)clsGlobals.arcWorkspaceGeocodeFGD;
+                bool blnFC_Exists= clsStaticMethods.NameExists(arcWork2, "DerivedRoads");
+                if (blnFC_Exists)
+                {
+                    // rename it
+                    Console.WriteLine("Feature Class name exists");
+                    return;
+                }
+
                 // create a feature class in the newly-created file geodatabase
-                clsGlobals.arcFeatClass_GeocodeRoads = clsStaticMethods.CreateFeatureClass("GeoCodeData", null, clsGlobals.arcFeatureWorkspaceGeocodeFGD);
+                clsGlobals.arcFeatClass_GeocodeRoads = clsStaticMethods.CreateFeatureClass("DerivedRoads", null, clsGlobals.arcFeatureWorkspaceGeocodeFGD);
 
                 // create a table in the newly-created file geodatabase
-
+                clsGlobals.arcTable_AltNames = clsStaticMethods.CreateTable("AltNamesRoads", null, clsGlobals.arcFeatureWorkspaceGeocodeFGD);
 
 
 
