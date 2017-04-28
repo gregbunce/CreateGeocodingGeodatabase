@@ -33,7 +33,7 @@ namespace conCreateGeocodeDerivativeData
 
                 // get/create the name for the new feature class of derived roads
                 clsGlobals.strNewGeocodeFeatClassName = "GeocodeRoads";
-                clsGlobals.strNewGeocodeTableName = "GeocodeAtlNames";
+                clsGlobals.strNewGeocodeTableName = "GeocodeRoadAtlNames";
 
                 // connect to sgid
                 clsGlobals.arcWorkspaceSGID = clsStaticMethods.ConnectToTransactionalVersion("", "sde:sqlserver:sgid.agrc.utah.gov", "SGID10", "DBMS", "sde.DEFAULT", "agrc", "agrc");
@@ -63,11 +63,19 @@ namespace conCreateGeocodeDerivativeData
                 if (blnFC_Exists)
                 {
                     // rename existing fc
+                    IFeatureClass arcFC_ToRename = clsGlobals.arcFeatureWorkspaceGeocodeFGD.OpenFeatureClass(clsGlobals.strNewGeocodeFeatClassName);
+                    clsGlobals.arcDatasetGeocodeFGD = (IDataset)arcFC_ToRename;
+                    clsGlobals.arcDatasetGeocodeFGD.Rename(clsGlobals.strNewGeocodeFeatClassName + "OldOn" + DateTime.Now.ToString("yyyyMMdd"));
+                    arcFC_ToRename = null;
 
                 }
                 if (blnTable_Exists)
                 {
                     // rename existing table
+                    ITable arcTable_ToRemane = clsGlobals.arcFeatureWorkspaceGeocodeFGD.OpenTable(clsGlobals.strNewGeocodeTableName);
+                    clsGlobals.arcDatasetGeocodeFGD = (IDataset)arcTable_ToRemane;
+                    clsGlobals.arcDatasetGeocodeFGD.Rename(clsGlobals.strNewGeocodeTableName + "OldOn" + DateTime.Now.ToString("yyyyMMdd"));
+                    arcTable_ToRemane = null;
 
                 }
 
