@@ -10,12 +10,22 @@ namespace conCreateGeocodeDerivativeData
 {
     class clsGlobals
     {
-        public static IFeatureClass arcFeatClass_Roads
+        public static IFeatureClass arcFeatClass_SGIDRoads
         {
             get;
             set;
         }
-        public static IFeature arcFeat_Roads
+        public static IFeatureClass arcFeatClass_GeocodeRoads
+        {
+            get;
+            set;
+        }
+        public static IFeature arcFeat_SGIDRoad
+        {
+            get;
+            set;
+        }
+        public static IFeature arcFeat_GeocodeRoad
         {
             get;
             set;
@@ -26,11 +36,6 @@ namespace conCreateGeocodeDerivativeData
             set;
         }
         public static IFeatureWorkspace arcFeatureWorkspaceSGID
-        {
-            get;
-            set;
-        }
-        public static IFeatureClass arcFeatClass_GeocodeRoads
         {
             get;
             set;
@@ -66,6 +71,16 @@ namespace conCreateGeocodeDerivativeData
             set;
         }
         public static IDataset arcDatasetGeocodeFGD
+        {
+            get;
+            set;
+        }
+        public static IFeatureCursor arcFeatureCurSGIDRoads
+        {
+            get;
+            set;
+        }
+        public static IQueryFilter arcQueryFilter_SGIDRoads
         {
             get;
             set;

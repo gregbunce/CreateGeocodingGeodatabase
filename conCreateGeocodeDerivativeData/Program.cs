@@ -5,6 +5,7 @@ using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.DataSourcesGDB;
 using ESRI.ArcGIS.Editor;
+using ESRI.ArcGIS.ADF;
 
 
 namespace conCreateGeocodeDerivativeData
@@ -39,16 +40,18 @@ namespace conCreateGeocodeDerivativeData
                 clsGlobals.arcWorkspaceSGID = clsStaticMethods.ConnectToTransactionalVersion("", "sde:sqlserver:sgid.agrc.utah.gov", "SGID10", "DBMS", "sde.DEFAULT", "agrc", "agrc");
                 clsGlobals.arcFeatureWorkspaceSGID = (IFeatureWorkspace)clsGlobals.arcWorkspaceSGID;
 
-                // get the source roads feature class
-                clsGlobals.arcFeatClass_Roads = clsGlobals.arcFeatureWorkspaceSGID.OpenFeatureClass(args[0]);
+                // get the source roads feature class (SGID)
+                clsGlobals.arcFeatClass_SGIDRoads = clsGlobals.arcFeatureWorkspaceSGID.OpenFeatureClass(args[0]);
 
-                //if (clsGlobals.arcFeat_Roads != null)
+                //// check if feature class was found
+                //if (clsGlobals.arcFeatClass_Roads != null)
                 //{
-                //    Console.WriteLine("Got access to the SGID feature class named: " + args[0]);                    
+                //    Console.WriteLine("Got access to the SGID feature class named: " + args[0]);
                 //}
                 //else
                 //{
-                //    Console.WriteLine("Cannot get access to the SGID feature class named: " + args[0]);
+                //    Console.WriteLine("ERROR: Cannot get access to the SGID feature class named: " + args[0] + ". Correct format for SDE should look something like this: SGID10.TRANSPORTATION.FeatureClassName");
+                //    //Console.ReadLine();  // make sure this line is commented out when running in forklift
                 //    return;
                 //}
 
@@ -79,7 +82,6 @@ namespace conCreateGeocodeDerivativeData
 
                 }
 
-
                 // create a feature class in the newly-created file geodatabase
                 clsGlobals.arcFeatClass_GeocodeRoads = clsStaticMethods.CreateFeatureClass(clsGlobals.strNewGeocodeFeatClassName, null, clsGlobals.arcFeatureWorkspaceGeocodeFGD);
 
@@ -87,19 +89,40 @@ namespace conCreateGeocodeDerivativeData
                 clsGlobals.arcTable_AltNames = clsStaticMethods.CreateTable(clsGlobals.strNewGeocodeTableName, null, clsGlobals.arcFeatureWorkspaceGeocodeFGD);
 
 
+                // create a feature cursor from the source roads data and loop through this subset
+                // create the query filter to filter results
+                string strQuery = string.Empty;
+                strQuery = @"STREETNAME = 'PLATEAU'";
+                clsGlobals.arcQueryFilter_SGIDRoads = new QueryFilter();
+                clsGlobals.arcQueryFilter_SGIDRoads.WhereClause = strQuery;
+
+                // create a ComReleaser for feature cursor's life-cycle management
+                using (ComReleaser comReleaser = new ComReleaser())
+                {
+                    clsGlobals.arcFeatureCurSGIDRoads = clsGlobals.arcFeatClass_SGIDRoads.Search(clsGlobals.arcQueryFilter_SGIDRoads, false);
+                    comReleaser.ManageLifetime(clsGlobals.arcFeatureCurSGIDRoads);
+
+                    // loop through the sgid roads' feature cursor
+                    while ((clsGlobals.arcFeat_SGIDRoad = clsGlobals.arcFeatureCurSGIDRoads.NextFeature()) != null)
+                    {
+                        // get the needed values from the source roads data
+                        string strAddressSys = clsGlobals.arcFeat_SGIDRoad.get_Value(clsGlobals.arcFeat_SGIDRoad.Fields.FindField("ADDR_SYS")).ToString().Trim().ToUpper();
+                        string strLeftFrom = clsGlobals.arcFeat_SGIDRoad.get_Value(clsGlobals.arcFeat_SGIDRoad.Fields.FindField("L_F_ADD")).ToString().Trim().ToUpper();
+                        string strLeftTo = clsGlobals.arcFeat_SGIDRoad.get_Value(clsGlobals.arcFeat_SGIDRoad.Fields.FindField("L_T_ADD")).ToString().Trim().ToUpper();
+                        string strRightFrom = clsGlobals.arcFeat_SGIDRoad.get_Value(clsGlobals.arcFeat_SGIDRoad.Fields.FindField("R_F_ADD")).ToString().Trim().ToUpper();
+                        string strRightTo = clsGlobals.arcFeat_SGIDRoad.get_Value(clsGlobals.arcFeat_SGIDRoad.Fields.FindField("R_T_ADD")).ToString().Trim().ToUpper();
+                        string strPredir = clsGlobals.arcFeat_SGIDRoad.get_Value(clsGlobals.arcFeat_SGIDRoad.Fields.FindField("PREDIR")).ToString().Trim().ToUpper();
+                        string strStreetName = clsGlobals.arcFeat_SGIDRoad.get_Value(clsGlobals.arcFeat_SGIDRoad.Fields.FindField("STREETNAME")).ToString().Trim().ToUpper();
+                        string strStreetType = clsGlobals.arcFeat_SGIDRoad.get_Value(clsGlobals.arcFeat_SGIDRoad.Fields.FindField("STREETTYPE")).ToString().Trim().ToUpper();
+                        string strSufDir = clsGlobals.arcFeat_SGIDRoad.get_Value(clsGlobals.arcFeat_SGIDRoad.Fields.FindField("SUFDIR")).ToString().Trim().ToUpper();
+
+                        // begin to populate the geocode feature class in the newly-created file geodatabase
+                        
 
 
-                ////get access to the file geodatabases and feature classes needed for this project
-                ////open file geodatabase workspace
-                //IWorkspaceFactory pWorkspaceFactory = new FileGDBWorkspaceFactory();
-                //IWorkspace pWorkspace = pWorkspaceFactory.OpenFromFile("C:\\Users\\gbunce\\Documents\\ArcGIS\\WeberPSAP_DataCSharpAddrPnts.gdb", 0);
-                //IFeatureWorkspace pFeatureWorkspace = (IFeatureWorkspace)pWorkspace;
 
-                //IFeatureClass pFeatClass = pFeatureWorkspace.OpenFeatureClass("CommonNames_1");
-                //Console.WriteLine("Got access to the feature class");
-
-
-
+                    }
+                }
 
             }
             catch (Exception ex)

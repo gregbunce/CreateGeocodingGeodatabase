@@ -54,9 +54,8 @@ namespace conCreateGeocodeDerivativeData
         }
         #endregion
 
-
-        #region "Create FileGeodatabase"
         // create a file geodatabase in user-specified location
+        #region "Create FileGeodatabase"
         public static IWorkspace CreateFileGdbWorkspace(string strFgdPath, string strFgdName)
         {
             IWorkspaceName workspaceName = null;
@@ -83,6 +82,7 @@ namespace conCreateGeocodeDerivativeData
         }
         #endregion
 
+        // create feature class in file geodatabase
         #region "create feature class in file geodatabase"
         public static ESRI.ArcGIS.Geodatabase.IFeatureClass CreateFeatureClass(String featureClassName, UID classExtensionUID, IFeatureWorkspace featureWorkspace)
         {
@@ -248,6 +248,7 @@ namespace conCreateGeocodeDerivativeData
         }
         #endregion
 
+        // create table in file geodatabase
         #region "create table in file geodatabase"
         public static ESRI.ArcGIS.Geodatabase.ITable CreateTable(String tableName, UID classExtensionUID, IFeatureWorkspace featureWorkspace)
         {
@@ -385,6 +386,7 @@ namespace conCreateGeocodeDerivativeData
         }
         #endregion
 
+        // check if data exists in file geodatabase
         #region "check if name exists in database"
         // this method checks if the feature class or table exist in the geodatabase
         public static bool NameExists(string strFCName, esriDatasetType dataType)
@@ -393,6 +395,7 @@ namespace conCreateGeocodeDerivativeData
             return blnNameExists;
         }
         #endregion
+
 
     }
 }
