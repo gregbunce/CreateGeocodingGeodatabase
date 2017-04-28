@@ -397,6 +397,7 @@ namespace conCreateGeocodeDerivativeData
         #endregion
 
         // insert new row/record in the geocode file geodatabase
+        #region "insert row into geodatabase"
         public static void InsertFeatureGeocodeFGD(IFeature arcFeatSGIDRoad, string strAddrSys, double dblLF, double dblLT, double dblRF, double dblRT, string strPredir, string strStreetname, string strStreetType, string strPostDir, string strZipRight, string strZipLeft, string strGlobalID)
         {
             try
@@ -429,16 +430,13 @@ namespace conCreateGeocodeDerivativeData
                 
                 // store the new feature
                 clsGlobals.arcFeat_GeocodeRoad.Store();
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine("There was an error with the conCreateGeocodeDerivativeData console application, in the clsStaticMethods.InsertFeatureGeocodeFGD method." + ex.Message + " " + ex.Source + " " + ex.InnerException + " " + ex.HResult + " " + ex.StackTrace + " " + ex);
                 Console.ReadLine();
             }
-        
         }
-
-
+        #endregion
     }
 }

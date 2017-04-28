@@ -70,7 +70,6 @@ namespace conCreateGeocodeDerivativeData
                     clsGlobals.arcDatasetGeocodeFGD = (IDataset)arcFC_ToRename;
                     clsGlobals.arcDatasetGeocodeFGD.Rename(clsGlobals.strNewGeocodeFeatClassName + "OldOn" + DateTime.Now.ToString("yyyyMMdd"));
                     arcFC_ToRename = null;
-
                 }
                 if (blnTable_Exists)
                 {
@@ -79,7 +78,6 @@ namespace conCreateGeocodeDerivativeData
                     clsGlobals.arcDatasetGeocodeFGD = (IDataset)arcTable_ToRemane;
                     clsGlobals.arcDatasetGeocodeFGD.Rename(clsGlobals.strNewGeocodeTableName + "OldOn" + DateTime.Now.ToString("yyyyMMdd"));
                     arcTable_ToRemane = null;
-
                 }
 
                 // create a feature class in the newly-created file geodatabase
@@ -88,11 +86,13 @@ namespace conCreateGeocodeDerivativeData
                 // create a table in the newly-created file geodatabase
                 clsGlobals.arcTable_AltNames = clsStaticMethods.CreateTable(clsGlobals.strNewGeocodeTableName, null, clsGlobals.arcFeatureWorkspaceGeocodeFGD);
 
-
                 // create a feature cursor from the source roads data and loop through this subset
                 // create the query filter to filter results
                 string strQuery = string.Empty;
-                strQuery = @"STREETNAME in ('PLATEAU','MAIN','100')";
+                // FOR TESTING...                 
+                strQuery = @"ADDR_SYS = 'SALT LAKE CITY' and CARTOCODE not in ('1','7','99') and ((L_F_ADD <> 0 and L_T_ADD <> 0) OR (R_F_ADD <> 0 and R_T_ADD <> 0)) and STREETNAME <> '' and STREETNAME not like '%ROUNDABOUT%'";
+                // GO LIVE...
+                //strQuery = @"CARTOCODE not in ('1','7','99') and ((L_F_ADD <> 0 and L_T_ADD <> 0) OR (R_F_ADD <> 0 and R_T_ADD <> 0)) and STREETNAME <> '' and STREETNAME not like '%ROUNDABOUT%'";
                 clsGlobals.arcQueryFilter_SGIDRoads = new QueryFilter();
                 clsGlobals.arcQueryFilter_SGIDRoads.WhereClause = strQuery;
 
@@ -126,7 +126,6 @@ namespace conCreateGeocodeDerivativeData
                         string strAlias1Type = arcFeat_SGIDRoad.get_Value(arcFeat_SGIDRoad.Fields.FindField("ALIAS1TYPE")).ToString().Trim().ToUpper();
                         string strAlias2 = arcFeat_SGIDRoad.get_Value(arcFeat_SGIDRoad.Fields.FindField("ALIAS2")).ToString().Trim().ToUpper();
                         string strAlias2Type = arcFeat_SGIDRoad.get_Value(arcFeat_SGIDRoad.Fields.FindField("ALIAS2TYPE")).ToString().Trim().ToUpper();
-                        string strAcsAlias = arcFeat_SGIDRoad.get_Value(arcFeat_SGIDRoad.Fields.FindField("ACSALIAS")).ToString().Trim().ToUpper();
                         string strAcsName = arcFeat_SGIDRoad.get_Value(arcFeat_SGIDRoad.Fields.FindField("ACSNAME")).ToString().Trim().ToUpper();
                         string strAcsSuf = arcFeat_SGIDRoad.get_Value(arcFeat_SGIDRoad.Fields.FindField("ACSSUF")).ToString().Trim().ToUpper();
                         string strZipLeft = arcFeat_SGIDRoad.get_Value(arcFeat_SGIDRoad.Fields.FindField("ZIPLEFT")).ToString().Trim().ToUpper();
@@ -156,18 +155,12 @@ namespace conCreateGeocodeDerivativeData
                         if (strAcsName != "")
                         {
                             // create a new feature
-                            clsStaticMethods.InsertFeatureGeocodeFGD(arcFeat_SGIDRoad, strAddressSys, dblLeftFrom, dblLeftTo, dblRightFrom, dblRightTo, strPredir, strAcsName, strStreetType, strAcsSuf, strZipRight, strZipLeft, strGlobalID);
+                            clsStaticMethods.InsertFeatureGeocodeFGD(arcFeat_SGIDRoad, strAddressSys, dblLeftFrom, dblLeftTo, dblRightFrom, dblRightTo, strPredir, strAcsName, string.Empty, strAcsSuf, strZipRight, strZipLeft, strGlobalID);
                         }
-
-
-
-
                     }
                     clsGlobals.arcWorkspaceEditGeocodeFGD.StopEditOperation();
                     clsGlobals.arcWorkspaceEditGeocodeFGD.StopEditing(true);
-
                 }
-
             }
             catch (Exception ex)
             {
@@ -182,15 +175,7 @@ namespace conCreateGeocodeDerivativeData
                     clsGlobals.arcWorkspaceEditGeocodeFGD.StopEditOperation();
                     clsGlobals.arcWorkspaceEditGeocodeFGD.StopEditing(false);
                 }
-
             }
-
-
-
-
-
-
-
         }
     }
 }
