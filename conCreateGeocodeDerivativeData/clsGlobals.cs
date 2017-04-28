@@ -20,11 +20,6 @@ namespace conCreateGeocodeDerivativeData
             get;
             set;
         }
-        public static IFeature arcFeat_SGIDRoad
-        {
-            get;
-            set;
-        }
         public static IFeature arcFeat_GeocodeRoad
         {
             get;
@@ -81,6 +76,11 @@ namespace conCreateGeocodeDerivativeData
             set;
         }
         public static IQueryFilter arcQueryFilter_SGIDRoads
+        {
+            get;
+            set;
+        }
+        public static IWorkspaceEdit arcWorkspaceEditGeocodeFGD
         {
             get;
             set;

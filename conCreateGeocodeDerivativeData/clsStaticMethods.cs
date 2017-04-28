@@ -396,6 +396,49 @@ namespace conCreateGeocodeDerivativeData
         }
         #endregion
 
+        // insert new row/record in the geocode file geodatabase
+        public static void InsertFeatureGeocodeFGD(IFeature arcFeatSGIDRoad, string strAddrSys, double dblLF, double dblLT, double dblRF, double dblRT, string strPredir, string strStreetname, string strStreetType, string strPostDir, string strZipRight, string strZipLeft, string strGlobalID)
+        {
+            try
+            {
+                // create a new feature
+                clsGlobals.arcFeat_GeocodeRoad = clsGlobals.arcFeatClass_GeocodeRoads.CreateFeature();
+                IGeometry arcGeomSGIDRoad = arcFeatSGIDRoad.ShapeCopy;                
+                
+                // simplify feature (not sure if this simplify is needed)
+                IFeatureSimplify arcFeaureSimplify = clsGlobals.arcFeat_GeocodeRoad as IFeatureSimplify;
+                arcFeaureSimplify.SimplifyGeometry(arcGeomSGIDRoad);
+
+                // set the geometry for the new feature
+                clsGlobals.arcFeat_GeocodeRoad.Shape = arcGeomSGIDRoad;
+
+                // set the field values for the new feature
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("ADDRSYS_L"), strAddrSys);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("ADDRSYS_R"), strAddrSys);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("FROMADDR_L"), dblLF);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("TOADDR_L"), dblLT);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("FROMADDR_R"), dblRF);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("TOADDR_R"), dblRT);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("PREDIR"), strPredir);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("NAME"), strStreetname);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("POSTTYPE"), strStreetType);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("POSTDIR"), strPostDir);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("ZIPCODE_L"), strZipLeft);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("ZIPCODE_R"), strZipRight);
+                clsGlobals.arcFeat_GeocodeRoad.set_Value(clsGlobals.arcFeatClass_GeocodeRoads.Fields.FindField("GLOBALID_SGID"), strGlobalID);
+                
+                // store the new feature
+                clsGlobals.arcFeat_GeocodeRoad.Store();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("There was an error with the conCreateGeocodeDerivativeData console application, in the clsStaticMethods.InsertFeatureGeocodeFGD method." + ex.Message + " " + ex.Source + " " + ex.InnerException + " " + ex.HResult + " " + ex.StackTrace + " " + ex);
+                Console.ReadLine();
+            }
+        
+        }
+
 
     }
 }
