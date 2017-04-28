@@ -57,5 +57,23 @@ namespace conCreateGeocodeDerivativeData
             get;
             set;
         }
+
+        public static IWorkspace2 arcWorkspace2GeocodeFGD
+        {
+            get;
+            set;
+        }
+
+        public static string strNewGeocodeFeatClassName
+        {
+            get;
+            set;
+        }
+
+        public static string strNewGeocodeTableName
+        {
+            get;
+            set;
+        }
     }
 }

@@ -489,15 +489,13 @@ namespace conCreateGeocodeDerivativeData
         #endregion
 
 
-
         // this method checks if the feature class or table exist in the geodatabase
-        public static bool NameExists(IWorkspace2 arcWorkspace2, string strFCName)
+        public static bool NameExists(string strFCName, esriDatasetType dataType)
         {
             bool blnNameExists;
-            return blnNameExists = arcWorkspace2.get_NameExists(esriDatasetType.esriDTAny, strFCName);
+            blnNameExists = clsGlobals.arcWorkspace2GeocodeFGD.get_NameExists(dataType, strFCName);
+            return blnNameExists;
         }
-
-
 
 
     }

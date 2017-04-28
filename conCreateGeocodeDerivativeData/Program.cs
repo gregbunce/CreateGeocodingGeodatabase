@@ -31,6 +31,10 @@ namespace conCreateGeocodeDerivativeData
                 }
                 Console.WriteLine("Checked out a license");
 
+                // get/create the name for the new feature class of derived roads
+                clsGlobals.strNewGeocodeFeatClassName = "GeocodeRoads";
+                clsGlobals.strNewGeocodeTableName = "GeocodeAtlNames";
+
                 // connect to sgid
                 clsGlobals.arcWorkspaceSGID = clsStaticMethods.ConnectToTransactionalVersion("", "sde:sqlserver:sgid.agrc.utah.gov", "SGID10", "DBMS", "sde.DEFAULT", "agrc", "agrc");
                 clsGlobals.arcFeatureWorkspaceSGID = (IFeatureWorkspace)clsGlobals.arcWorkspaceSGID;
@@ -52,21 +56,27 @@ namespace conCreateGeocodeDerivativeData
                 clsGlobals.arcWorkspaceGeocodeFGD = clsStaticMethods.CreateFileGdbWorkspace(args[1], args[2]);
                 clsGlobals.arcFeatureWorkspaceGeocodeFGD = (IFeatureWorkspace)clsGlobals.arcWorkspaceGeocodeFGD;
 
-                // check if the feature class or table names exist in the file geodatabase
-                IWorkspace2 arcWork2 = (IWorkspace2)clsGlobals.arcWorkspaceGeocodeFGD;
-                bool blnFC_Exists= clsStaticMethods.NameExists(arcWork2, "DerivedRoads");
+                // check if the feature class and table exist in the file geodatabase - if so rename them before adding new data
+                clsGlobals.arcWorkspace2GeocodeFGD = (IWorkspace2)clsGlobals.arcWorkspaceGeocodeFGD;
+                bool blnFC_Exists = clsStaticMethods.NameExists(clsGlobals.strNewGeocodeFeatClassName, esriDatasetType.esriDTFeatureClass);
+                bool blnTable_Exists = clsStaticMethods.NameExists(clsGlobals.strNewGeocodeTableName, esriDatasetType.esriDTTable);
                 if (blnFC_Exists)
                 {
-                    // rename it
-                    Console.WriteLine("Feature Class name exists");
-                    return;
+                    // rename existing fc
+
+                }
+                if (blnTable_Exists)
+                {
+                    // rename existing table
+
                 }
 
+
                 // create a feature class in the newly-created file geodatabase
-                clsGlobals.arcFeatClass_GeocodeRoads = clsStaticMethods.CreateFeatureClass("DerivedRoads", null, clsGlobals.arcFeatureWorkspaceGeocodeFGD);
+                clsGlobals.arcFeatClass_GeocodeRoads = clsStaticMethods.CreateFeatureClass(clsGlobals.strNewGeocodeFeatClassName, null, clsGlobals.arcFeatureWorkspaceGeocodeFGD);
 
                 // create a table in the newly-created file geodatabase
-                clsGlobals.arcTable_AltNames = clsStaticMethods.CreateTable("AltNamesRoads", null, clsGlobals.arcFeatureWorkspaceGeocodeFGD);
+                clsGlobals.arcTable_AltNames = clsStaticMethods.CreateTable(clsGlobals.strNewGeocodeTableName, null, clsGlobals.arcFeatureWorkspaceGeocodeFGD);
 
 
 
