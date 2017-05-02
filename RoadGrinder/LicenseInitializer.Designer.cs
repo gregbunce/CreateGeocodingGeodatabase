@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace conCreateGeocodeDerivativeData
+namespace RoadGrinder
 {
     using System;
     using System.Collections.Generic;
